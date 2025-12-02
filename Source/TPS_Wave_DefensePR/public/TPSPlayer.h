@@ -31,4 +31,48 @@ public:
 	class USpringArmComponent* springArmComp;
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* tpsCamComp;
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputMappingContext* imc_TPS;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ia_LookUp;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ia_Turn;
+
+	// 좌우 회전 입력 처리
+	void Turn(const struct FInputActionValue& inputValue);
+	// 상하 회전 입력 처리
+	void LookUp(const struct FInputActionValue& inputValue);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ia_Move;
+	// 걷기 속도
+	UPROPERTY(EditAnywhere, Category=PlayerSetting)
+	float walkSpeed = 200;
+	// 이동 방향
+	FVector direction;
+
+	void Move(const struct FInputActionValue& inputValue);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ia_Jump;
+	// 점프 입력 이벤트 처리 함수
+	void InputJump(const struct FInputActionValue& inputValue);
+
+	// 플레이어 이동 처리
+	void PlayerMove();
+
+	// 총 스켈레탈 메시
+	UPROPERTY(VisibleAnywhere, Category = GunMesh)
+	class USkeletalMeshComponent* gunMeshComp;
+
+	// 총알 공장
+	UPROPERTY(EditDefaultsOnly, Category=BulletFactory)
+	TSubclassOf<class ABullet> bulletFactory;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	class UInputAction* ia_Fire;
+	// 총알 발사 처리함수
+	void InputFire(const struct FInputActionValue& inputValue);
 };
