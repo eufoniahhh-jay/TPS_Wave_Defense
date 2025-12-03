@@ -29,7 +29,7 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArmComp;
-	UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	class UCameraComponent* tpsCamComp;
 
 public:
@@ -75,4 +75,43 @@ public:
 	class UInputAction* ia_Fire;
 	// 총알 발사 처리함수
 	void InputFire(const struct FInputActionValue& inputValue);
+
+	// 스나이퍼건 스태틱매시 추가
+	UPROPERTY(EditAnywhere, Category = GunMesh)
+	class UStaticMeshComponent* sniperGunComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ia_GrenadeGun;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ia_SniperGun;
+	// 유탄총 사용중인지 여부
+	bool bUsingGrenadeGun = true;
+	// 유탄총으로 변경
+	void ChangeToGrenadeGun(const struct FInputActionValue& inputValue);
+	// 스나이퍼건으로 변경
+	void ChangeToSniperGun(const struct FInputActionValue& inputValue);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ia_Sniper;
+	// 스나이퍼 조준 처리 함수
+	void SniperAim(const struct FInputActionValue& InputValue);
+	// 스나이퍼 조준 중인지 여부
+	bool bSniperAim = false;
+	// 스나이퍼 UI 위젯 공장
+	UPROPERTY(EditDefaultsOnly, Category=SniperUI)
+	TSubclassOf<class UUserWidget> sniperUIFactory;
+	// 스나이퍼 UI 위젯 인스턴스
+	UPROPERTY()
+	class UUserWidget* _sniperUI;
+
+	// 총알 파편 효과 공장
+	UPROPERTY(EditAnywhere, Category=BulletEffect)
+	class UParticleSystem* bulletEffectFactory;
+
+	// 일반 조준 크로스헤어UI 위젯
+	UPROPERTY(EditDefaultsOnly, Category = SniperUI)
+	TSubclassOf<class UUserWidget> crosshairUIFactory;
+	// 크로스헤어 인스턴스
+	UPROPERTY()
+	class UUserWidget* _crosshairUI;
 };
