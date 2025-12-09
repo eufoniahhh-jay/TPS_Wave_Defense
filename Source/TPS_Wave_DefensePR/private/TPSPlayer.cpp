@@ -8,6 +8,8 @@
 #include "EnhancedInputComponent.h"
 #include "PlayerMove.h"
 #include "PlayerFire.h"
+#include "TPS_Wave_DefensePR.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -76,15 +78,13 @@ ATPSPlayer::ATPSPlayer()
 	}
 
 	playerMove = CreateDefaultSubobject<UPlayerMove>(TEXT("PlayerMove"));
-	playerFire = CreateDefaultSubobject<UPlayerFire>(TEXT("PlayerFire"));
+	//playerFire = CreateDefaultSubobject<UPlayerFire>(TEXT("PlayerFire"));
 }
 
 // Called when the game starts or when spawned
 void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
-
 	
 	auto pc = Cast<APlayerController>(Controller);
 	if (pc) {
@@ -94,15 +94,13 @@ void ATPSPlayer::BeginPlay()
 		}
 	}
 
-	
+	hp = initialHp;
 }
 
 // Called every frame
 void ATPSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	
 }
 
 // Called to bind functionality to input
@@ -114,14 +112,28 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	if (PlayerInput) {
 		// 컴포넌트에서 입력 바인딩 처리하도록 호출
-		playerMove->SetupInputBinding(PlayerInput);
-		playerFire->SetupInputBinding(PlayerInput);
+		//playerMove->SetupInputBinding(PlayerInput);
+		//playerFire->SetupInputBinding(PlayerInput);
+
+		onInputBindingDelegate.Broadcast(PlayerInput);
 	}
 }
 
+void ATPSPlayer::OnHitEvent()
+{
+	PRINT_LOG(TEXT("Damaged!!!!!!"));
+	hp--;
+	if (hp <= 0) {
+		PRINT_LOG(TEXT("Player is dead!"));
+		OnGameOver();
+	}
+}
 
-
-
+void ATPSPlayer::OnGameOver_Implementation()
+{
+	// 게임 오버 시 일시 정지
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+}
 
 
 

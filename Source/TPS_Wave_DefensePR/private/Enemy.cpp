@@ -26,12 +26,12 @@ AEnemy::AEnemy()
 	// EnemyFSM 컴포넌트 추가
 	fsm = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
 
-	// 애니메이션 블루프린트 할당하기
-	ConstructorHelpers::FClassFinder<UAnimInstance> tempClass(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/ABP_Enemy.ABP_Enemy_C'"));
-	//ConstructorHelpers::FClassFinder<UAnimInstance> tempClass(TEXT("AnimBlueprint'/Game/Blueprints/ABP_Enemy.ABP_Enemy_C'"));
-	if (tempClass.Succeeded()) {
-		GetMesh()->SetAnimInstanceClass(tempClass.Class);
-	}
+	// 애니메이션 블루프린트 할당하기 -> 자꾸 크래시 발생하는 부분. 변경해보기
+	//ConstructorHelpers::FClassFinder<UAnimInstance> tempClass(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/ABP_Enemy.ABP_Enemy_C'"));
+	////ConstructorHelpers::FClassFinder<UAnimInstance> tempClass(TEXT("AnimBlueprint'/Game/Blueprints/ABP_Enemy.ABP_Enemy_C'"));
+	//if (tempClass.Succeeded()) {
+	//	GetMesh()->SetAnimInstanceClass(tempClass.Class);
+	//}
 
 	// 월드에 배치되거나 스폰될 때 자동으로 AIController부터 Possess될 수 있도록 설정
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -42,6 +42,10 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	/*if (AnimBP.IsValid())
+	{
+		GetMesh()->SetAnimInstanceClass(AnimBP.Get());
+	}*/
 }
 
 // Called every frame

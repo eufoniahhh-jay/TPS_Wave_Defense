@@ -30,4 +30,10 @@ public:
 	// 적 AI 관리 컴포넌트 클래스
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
 	class UEnemyFSM* fsm;
+
+public:
+	// 늘 발생하던 크래시 해결해보기 (기존의 FClassFinder로 AnimBP를 로드하는 방식을 대체하기)
+	/*UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TSoftClassPtr<UAnimInstance> AnimBP;*/
+
 };
