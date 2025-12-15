@@ -10,6 +10,7 @@
 #include "EnemyFSM.h"
 #include <Camera/CameraComponent.h>
 #include "PlayerAnim.h"
+#include "WaveManager.h"
 
 UPlayerFire::UPlayerFire()
 {
@@ -37,6 +38,24 @@ void UPlayerFire::BeginPlay()
 
 	// 기본으로 스나이퍼건을 사용하도록 변경
 	ChangeToSniperGun(FInputActionValue());
+
+	// 웨이브 매니저 관련 코드
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(
+		GetWorld(),
+		AWaveManager::StaticClass(),
+		FoundActors
+	);
+
+	if (FoundActors.Num() > 0)
+	{
+		WaveManager = Cast<AWaveManager>(FoundActors[0]);
+		UE_LOG(LogTemp, Warning, TEXT("[PlayerFire] WaveManager FOUND"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[PlayerFire] WaveManager NOT FOUND"));
+	}
 }
 
 void UPlayerFire::SetupInputBinding(UEnhancedInputComponent* PlayerInput)
@@ -54,6 +73,9 @@ void UPlayerFire::SetupInputBinding(UEnhancedInputComponent* PlayerInput)
 
 void UPlayerFire::InputFire(const FInputActionValue& inputValue)
 {
+	if (!CanProcessInput())
+		return;
+
 	// 총알 발사 사운드 재생하기
 	UGameplayStatics::PlaySound2D(GetWorld(), bulletSound);
 
@@ -167,4 +189,9 @@ void UPlayerFire::SniperAim(const FInputActionValue& InputValue)
 		// 4. 일반 조준 UI 등록
 		_crosshairUI->AddToViewport();
 	}
+}
+
+bool UPlayerFire::CanProcessInput() const
+{
+	return WaveManager && WaveManager->IsInWave();
 }

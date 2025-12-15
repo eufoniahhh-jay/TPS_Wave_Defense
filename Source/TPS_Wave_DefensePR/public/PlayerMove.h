@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+class AWaveManager;
+
 UCLASS()
 class TPS_WAVE_DEFENSEPR_API UPlayerMove : public UPlayerBaseComponent
 {
@@ -62,4 +65,12 @@ public:
 	class UInputAction* ia_Jump;
 	// 점프 입력 이벤트 처리 함수
 	void InputJump(const struct FInputActionValue& inputValue);
+
+public:
+	// 현재 입력을 처리해도 되는 상태인지
+	bool CanProcessInput() const;
+
+	// Wave 상태 확인용
+	UPROPERTY()
+	AWaveManager* WaveManager = nullptr;
 };

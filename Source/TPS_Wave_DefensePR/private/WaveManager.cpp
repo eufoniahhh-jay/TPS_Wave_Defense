@@ -109,3 +109,19 @@ void AWaveManager::EndWave()
     WaveState = EWaveState::Waiting;
 }
 
+void AWaveManager::StartNextWave()
+{
+    CurrentStage++;
+    RemainingTime = WaveDuration;
+    WaveState = EWaveState::InWave;
+
+    UE_LOG(LogTemp, Log, TEXT("[WaveManager] Start Next Wave | Stage=%d"), CurrentStage);
+
+    StartWave(); // 기존 웨이브 시작 함수
+}
+
+bool AWaveManager::IsInWave()
+{
+    return WaveState == EWaveState::InWave;
+}
+

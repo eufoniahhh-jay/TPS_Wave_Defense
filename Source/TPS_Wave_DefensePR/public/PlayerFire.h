@@ -10,6 +10,9 @@
  * 
  */
 //UCLASS()
+
+class AWaveManager;
+
 UCLASS(ClassGroup = (PlayerComponent), meta = (BlueprintSpawnableComponent))
 class TPS_WAVE_DEFENSEPR_API UPlayerFire : public UPlayerBaseComponent
 {
@@ -81,4 +84,12 @@ public:
 	// 총알 발사 사운드
 	UPROPERTY(EditDefaultsOnly, Category = Sound)
 	class USoundBase* bulletSound;
+
+public:
+	// 현재 입력을 처리해도 되는 상태인지
+	bool CanProcessInput() const;
+
+	// Wave 상태 확인용
+	UPROPERTY()
+	AWaveManager* WaveManager = nullptr;
 };

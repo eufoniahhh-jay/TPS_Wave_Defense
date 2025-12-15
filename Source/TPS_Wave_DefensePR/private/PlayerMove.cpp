@@ -4,6 +4,8 @@
 #include "PlayerMove.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
+#include <Kismet/GameplayStatics.h>
+#include "WaveManager.h"
 
 UPlayerMove::UPlayerMove()
 {
@@ -17,6 +19,24 @@ void UPlayerMove::BeginPlay()
 
 	// 초기 속도를 걷기 속도로 설정
 	moveComp->MaxWalkSpeed = walkSpeed;
+
+	// 웨이브 매니저 관련 코드
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(
+		GetWorld(),
+		AWaveManager::StaticClass(),
+		FoundActors
+	);
+
+	if (FoundActors.Num() > 0)
+	{
+		WaveManager = Cast<AWaveManager>(FoundActors[0]);
+		UE_LOG(LogTemp, Warning, TEXT("[PlayerFire] WaveManager FOUND"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[PlayerFire] WaveManager NOT FOUND"));
+	}
 }
 
 void UPlayerMove::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -52,6 +72,9 @@ void UPlayerMove::LookUp(const FInputActionValue& inputValue)
 
 void UPlayerMove::Move(const struct FInputActionValue& inputValue)
 {
+	if (!CanProcessInput())
+		return;
+
 	FVector2D value = inputValue.Get<FVector2D>();
 	// 상하 입력 이벤트 처리
 	direction.X = value.X;
@@ -61,6 +84,9 @@ void UPlayerMove::Move(const struct FInputActionValue& inputValue)
 
 void UPlayerMove::PlayerMove()
 {
+	if (!CanProcessInput())
+		return;
+
 	//	// 플레이어 이동 처리
 	// 등속 운동
 	// P(결과위치) = P0(현재위치) + v(속도) X t(시간)
@@ -90,4 +116,9 @@ void UPlayerMove::InputRun()
 void UPlayerMove::InputJump(const FInputActionValue& inputValue)
 {
 	me->Jump();
+}
+
+bool UPlayerMove::CanProcessInput() const
+{
+	return WaveManager && WaveManager->IsInWave();
 }

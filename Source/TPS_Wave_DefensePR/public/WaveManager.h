@@ -119,10 +119,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Wave")
 	void EndWave();
 
+	UFUNCTION(BlueprintCallable)
+	void StartNextWave();
+
+
 public:
 	// 타이머
 
 	// 웨이브 타이머 핸들
 	FTimerHandle WaveTimerHandle;
+
+public:
+	// 현재 웨이브 상태 체크
+	UFUNCTION(BlueprintCallable)
+	bool IsInWave();
+
 
 };

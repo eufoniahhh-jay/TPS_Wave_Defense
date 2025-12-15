@@ -11,6 +11,7 @@
 #include <AIController.h>
 #include <NavigationSystem.h>
 #include "Navigation/PathFollowingComponent.h"
+#include "WaveManager.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -40,6 +41,24 @@ void UEnemyFSM::BeginPlay()
 
 	// AAIController 할당하기
 	ai = Cast<AAIController>(me->GetController());
+
+	// 웨이브 매니저 관련 코드
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(
+		GetWorld(),
+		AWaveManager::StaticClass(),
+		FoundActors
+	);
+
+	if (FoundActors.Num() > 0)
+	{
+		WaveManager = Cast<AWaveManager>(FoundActors[0]);
+		UE_LOG(LogTemp, Warning, TEXT("[PlayerFire] WaveManager FOUND"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[PlayerFire] WaveManager NOT FOUND"));
+	}
 }
 
 
@@ -47,6 +66,9 @@ void UEnemyFSM::BeginPlay()
 void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (!CanProcessAI())
+		return;
 
 	// 실행창에 상태 메시지 출력하기
 	FString logMsg = UEnum::GetValueAsString(mState);
@@ -253,4 +275,9 @@ bool UEnemyFSM::GetRandomPositionInNavMesh(FVector centerLocation, float radius,
 	bool result = ns->GetRandomReachablePointInRadius(centerLocation, radius, loc);
 	dest = loc.Location;
 	return result;
+}
+
+bool UEnemyFSM::CanProcessAI() const
+{
+	return WaveManager && WaveManager->IsInWave();
 }

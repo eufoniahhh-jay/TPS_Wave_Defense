@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "EnemyFSM.generated.h"
 
+class AWaveManager;
+
 // 사용할 상태 정의
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
@@ -98,4 +100,12 @@ public:
 	FVector randomPos;
 	// 랜덤 위치 가져오기
 	bool GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest);
+
+public:
+	// Wave 상태 확인용
+	UPROPERTY()
+	AWaveManager* WaveManager = nullptr;
+
+	// 현재 적 AI를 처리해도 되는 상태인지
+	bool CanProcessAI() const;
 };
