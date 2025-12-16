@@ -2,6 +2,8 @@
 
 
 #include "WaveManager.h"
+#include <Kismet/GameplayStatics.h>
+#include "EnemyManager.h"
 
 // Sets default values
 AWaveManager::AWaveManager()
@@ -29,6 +31,15 @@ void AWaveManager::BeginPlay()
             *UEnum::GetValueAsString(WaveState));
     }
 
+    // enemyManager 관련
+    TArray<AActor*> Found;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyManager::StaticClass(), Found);
+
+    if (Found.Num() > 0)
+    {
+        EnemyManager = Cast<AEnemyManager>(Found[0]);
+    }
+
     // 테스트용 (나중에 제거)
     StartWave();
 }
@@ -48,8 +59,11 @@ void AWaveManager::StartWave()
     WaveState = EWaveState::InWave;
     RemainingTime = WaveDuration;
 
-    if (bDebugLog)
-    {
+    if (EnemyManager) {
+        EnemyManager->StartSpawning();
+    }
+
+    if (bDebugLog) {
         UE_LOG(LogTemp, Log,
             TEXT("[WaveManager] Wave START | Stage=%d | Duration=%.1f"),
             CurrentStage,
@@ -101,21 +115,51 @@ void AWaveManager::EndWave()
         );
     }
 
+    //
+    // Enemy 정리
+    /*TArray<AActor*> Enemies;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyBase::StaticClass(), Enemies);
+
+    for (AActor* Enemy : Enemies)
+    {
+        Enemy->Destroy();
+    }*/
+    if (EnemyManager)
+    {
+        EnemyManager->StopSpawning();
+        EnemyManager->ClearAllEnemies();
+    }
+    //
+
     // Broadcast
     OnWaveEnd.Broadcast(CurrentStage);
 
     // 다음 스테이지 준비
-    CurrentStage++;
+    // CurrentStage++;
     WaveState = EWaveState::Waiting;
 }
 
 void AWaveManager::StartNextWave()
 {
     CurrentStage++;
-    RemainingTime = WaveDuration;
-    WaveState = EWaveState::InWave;
+    /*
+    //RemainingTime = WaveDuration;
+    //WaveState = EWaveState::InWave;
 
-    UE_LOG(LogTemp, Log, TEXT("[WaveManager] Start Next Wave | Stage=%d"), CurrentStage);
+    //UE_LOG(LogTemp, Log, TEXT("[WaveManager] Start Next Wave | Stage=%d"), CurrentStage);
+
+    ////
+    //OnWaveStart.Broadcast(CurrentStage, WaveDuration);
+
+    //GetWorld()->GetTimerManager().SetTimer(
+    //    WaveTimerHandle,
+    //    this,
+    //    &AWaveManager::UpdateWave,
+    //    1.0f,
+    //    true
+    //);
+    //
+    */
 
     StartWave(); // 기존 웨이브 시작 함수
 }

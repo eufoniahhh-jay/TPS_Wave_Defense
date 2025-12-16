@@ -11,6 +11,8 @@ Delegate 이벤트 구조를 통해
 UI·AI·사운드 시스템과 느슨하게 결합된
 중앙 게임 루프 컨트롤러 역할을 합니다.*/
 
+class AEnemyManager;
+
 // ---- Delegate Declarations ----
 // 웨이브 시작 (Stage 번호 + 제한 시간)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
@@ -134,5 +136,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsInWave();
 
-
+public:
+	// 웨이브 종료시 enemy 제거 위함
+	UPROPERTY()
+	AEnemyManager* EnemyManager;
 };

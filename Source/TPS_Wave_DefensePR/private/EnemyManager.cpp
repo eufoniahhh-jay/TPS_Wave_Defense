@@ -21,10 +21,11 @@ void AEnemyManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// 1. 랜덤 생성 시간 구하기
-	float createTime = FMath::RandRange(minTime, maxTime);
-	// 2. Timer Manager한테 알람 등록
-	GetWorld()->GetTimerManager().SetTimer(spawnTimerHandle, this, &AEnemyManager::CreateEnemy, createTime);
+	//// 1. 랜덤 생성 시간 구하기
+	//float createTime = FMath::RandRange(minTime, maxTime);
+	//// 2. Timer Manager한테 알람 등록
+	//GetWorld()->GetTimerManager().SetTimer(spawnTimerHandle, this, &AEnemyManager::CreateEnemy, createTime);
+	StartSpawning();
 
 	// 스폰 위치 동적 할당
 	FindSpawnPoints();
@@ -75,4 +76,38 @@ void AEnemyManager::FindSpawnPoints()
 			spawnPoints.Add(spawn);
 		}
 	}
+}
+
+void AEnemyManager::ClearAllEnemies()
+{
+	TArray<AActor*> Enemies;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), Enemies);
+
+	for (AActor* Enemy : Enemies)
+	{
+		Enemy->Destroy();
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("[EnemyManager] All enemies cleared"));
+}
+
+void AEnemyManager::StartSpawning()
+{
+	float createTime = FMath::RandRange(minTime, maxTime);
+	GetWorld()->GetTimerManager().SetTimer(
+		spawnTimerHandle,
+		this,
+		&AEnemyManager::CreateEnemy,
+		createTime,
+		false
+	);
+
+	UE_LOG(LogTemp, Log, TEXT("[EnemyManager] Start Wave Spawning"));
+}
+
+void AEnemyManager::StopSpawning()
+{
+	GetWorld()->GetTimerManager().ClearTimer(spawnTimerHandle);
+
+	UE_LOG(LogTemp, Log, TEXT("[EnemyManager] Stop Wave Spawning"));
 }

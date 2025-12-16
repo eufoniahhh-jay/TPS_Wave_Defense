@@ -45,4 +45,12 @@ public:
 
 	// 스폰할 위치 동적 찾아 할당하기
 	void FindSpawnPoints();
+
+public:
+	// 웨이브 종료 후 enemy 제거를 위함
+	void ClearAllEnemies();
+	// 스포닝 시작/종료 (웨이브 타이밍에 맞춰서)
+	void StartSpawning();
+	void StopSpawning();
+
 };
