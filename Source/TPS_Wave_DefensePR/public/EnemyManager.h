@@ -53,4 +53,8 @@ public:
 	void StartSpawning();
 	void StopSpawning();
 
+	UPROPERTY()
+	class AWaveManager* WaveManager;
+
+	
 };

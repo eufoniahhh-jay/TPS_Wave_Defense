@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include <EngineUtils.h>
 #include <Kismet/GameplayStatics.h>
+#include "WaveManager.h"
 
 // Sets default values
 AEnemyManager::AEnemyManager()
@@ -20,6 +21,13 @@ AEnemyManager::AEnemyManager()
 void AEnemyManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// WaveManager 찾기
+	TArray<AActor*> FoundManagers;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWaveManager::StaticClass(), FoundManagers);
+	if (FoundManagers.Num() > 0) {
+		WaveManager = Cast<AWaveManager>(FoundManagers[0]);
+	}
 	
 	//// 1. 랜덤 생성 시간 구하기
 	//float createTime = FMath::RandRange(minTime, maxTime);
@@ -40,14 +48,52 @@ void AEnemyManager::Tick(float DeltaTime)
 
 void AEnemyManager::CreateEnemy()
 {
+	// + 안전 장치
+	if (spawnPoints.Num() == 0 || !enemyFactory)
+		return;
+
 	// 랜덤 위치 구하기
 	int index = FMath::RandRange(0, spawnPoints.Num() - 1);
 	// 적 생성 및 배치하기
-	GetWorld()->SpawnActor<AEnemy>(enemyFactory, spawnPoints[index]->GetActorLocation(), FRotator(0));
+	AEnemy* Enemy = GetWorld()->SpawnActor<AEnemy>(enemyFactory, spawnPoints[index]->GetActorLocation(), FRotator(0));
+
+	// Difficulty 적용
+	if (Enemy && WaveManager)
+	{
+		FEnemyDifficulty Diff = WaveManager->GetDifficultyForSpawn();
+		Enemy->ApplyDifficulty(Diff);
+
+		UE_LOG(LogTemp, Log,
+			TEXT("[EnemyManager] Spawn Enemy | Star=%d"),
+			Diff.StarLevel
+		);
+	}
 
 	// 다시 랜덤 시간에 CreateEnemy 함수가 호출되도록 타이머 설정
-	float createTime = FMath::RandRange(minTime, maxTime);
-	GetWorld()->GetTimerManager().SetTimer(spawnTimerHandle, this, &AEnemyManager::CreateEnemy, createTime);
+	/*float createTime = FMath::RandRange(minTime, maxTime);
+	GetWorld()->GetTimerManager().SetTimer(spawnTimerHandle, this, &AEnemyManager::CreateEnemy, createTime);*/
+
+	// 이제는 wave가 증가할 수록 더 빨리 적이 생성되도록 할 것이므로, stage 반영해서 수정
+	float createTime = minTime;
+
+	if (WaveManager)
+	{
+		createTime = WaveManager->GetSpawnInterval();
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(
+		spawnTimerHandle,
+		this,
+		&AEnemyManager::CreateEnemy,
+		createTime,
+		false
+	);
+
+	UE_LOG(LogTemp, Log,
+		TEXT("[EnemyManager] Next Spawn In %.2f sec (Stage=%d)"),
+		createTime,
+		WaveManager ? WaveManager->GetCurrentStage() : -1
+	);
 }
 
 // 스폰 위치 동적할당
@@ -93,7 +139,23 @@ void AEnemyManager::ClearAllEnemies()
 
 void AEnemyManager::StartSpawning()
 {
-	float createTime = FMath::RandRange(minTime, maxTime);
+	/*float createTime = FMath::RandRange(minTime, maxTime);
+	GetWorld()->GetTimerManager().SetTimer(
+		spawnTimerHandle,
+		this,
+		&AEnemyManager::CreateEnemy,
+		createTime,
+		false
+	);
+	UE_LOG(LogTemp, Log, TEXT("[EnemyManager] Start Wave Spawning"));*/
+
+	float createTime = minTime;
+
+	if (WaveManager)
+	{
+		createTime = WaveManager->GetSpawnInterval();
+	}
+
 	GetWorld()->GetTimerManager().SetTimer(
 		spawnTimerHandle,
 		this,
@@ -102,7 +164,10 @@ void AEnemyManager::StartSpawning()
 		false
 	);
 
-	UE_LOG(LogTemp, Log, TEXT("[EnemyManager] Start Wave Spawning"));
+	UE_LOG(LogTemp, Log,
+		TEXT("[EnemyManager] Start Wave Spawning | FirstSpawn=%.2f"),
+		createTime
+	);
 }
 
 void AEnemyManager::StopSpawning()

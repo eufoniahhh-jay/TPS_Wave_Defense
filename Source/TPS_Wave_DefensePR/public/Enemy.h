@@ -6,6 +6,31 @@
 #include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
+USTRUCT(BlueprintType)
+struct FEnemyDifficulty
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 StarLevel = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float HPMultiplier = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float MoveSpeedMultiplier = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float AttackSpeedMultiplier = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float AttackRangeMultiplier = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SpawnWeight = 1.0f;
+};
+
+
 UCLASS()
 class TPS_WAVE_DEFENSEPR_API AEnemy : public ACharacter
 {
@@ -36,4 +61,11 @@ public:
 	/*UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TSoftClassPtr<UAnimInstance> AnimBP;*/
 
+public:
+	// difficulty 적용 함수
+	void ApplyDifficulty(const FEnemyDifficulty& Difficulty);
+
+	// 시작 difficulty
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int32 StarLevel = 1;
 };

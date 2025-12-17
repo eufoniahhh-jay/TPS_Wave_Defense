@@ -108,4 +108,11 @@ public:
 
 	// 현재 적 AI를 처리해도 되는 상태인지
 	bool CanProcessAI() const;
+
+public:
+	// enemy difficulty 위한 코드
+	int32 BaseHP;
+	float BaseAttackRange;
+	float BaseAttackDelay;
+
 };

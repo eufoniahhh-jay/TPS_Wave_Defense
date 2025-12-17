@@ -59,6 +59,11 @@ void UEnemyFSM::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("[PlayerFire] WaveManager NOT FOUND"));
 	}
+
+	// FSM에는 기본값(Base)이 있어야 하니까, 안전하게.
+	BaseHP = hp;
+	BaseAttackRange = attackRange;
+	BaseAttackDelay = attackDelayTime;
 }
 
 

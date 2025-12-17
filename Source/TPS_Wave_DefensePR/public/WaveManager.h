@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Enemy.h"
 #include "WaveManager.generated.h"
 
 /*WaveManager는 enum 기반 상태 머신과
@@ -140,4 +141,31 @@ public:
 	// 웨이브 종료시 enemy 제거 위함
 	UPROPERTY()
 	AEnemyManager* EnemyManager;
+
+public:
+	// enemy Difficulty 관련
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Difficulty")
+	TArray<FEnemyDifficulty> DifficultyTable;
+	// Difficulty 변환 함수
+	TArray<FEnemyDifficulty> GetAvailableDifficulties();
+
+	bool IsDifficultyAllowedForStage(int32 StarLevel);
+
+	FEnemyDifficulty SelectDifficultyByWeight( const TArray<FEnemyDifficulty>& Candidates);
+
+	// 현재 웨이브의 기본 난이도
+	UPROPERTY()
+	FEnemyDifficulty CurrentWaveDifficulty;
+
+	// (미래 확장용) 스폰 단위 난이도 사용 여부
+	// 지금은 false 고정하고, 나중에 true로 바꿔주면 확장 가능
+	UPROPERTY(EditAnywhere, Category = "Difficulty")
+	bool bUsePerSpawnDifficulty = true;
+
+	// Enemy에게 줄 difficulty 요청 함수
+	FEnemyDifficulty GetDifficultyForSpawn();
+
+public:
+	// 언제 스폰할지 판단하는 함수
+	float GetSpawnInterval();
 };

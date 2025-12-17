@@ -62,3 +62,26 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void AEnemy::ApplyDifficulty(const FEnemyDifficulty& Difficulty)
+{
+	/*fsm->hp *= Difficulty.HPMultiplier;
+	fsm->attackRange *= Difficulty.AttackRangeMultiplier;
+	fsm->attackDelayTime /= Difficulty.AttackSpeedMultiplier;*/
+	//GetCharacterMovement()->MaxWalkSpeed *= Difficulty.MoveSpeedMultiplier;
+
+	// StarLevel 저장 (이게 핵심)
+	StarLevel = Difficulty.StarLevel;
+
+	// 반드시 Base 기준으로 재계산
+	fsm->hp = fsm->BaseHP * Difficulty.HPMultiplier;
+	fsm->attackRange = fsm->BaseAttackRange * Difficulty.AttackRangeMultiplier;
+	fsm->attackDelayTime = fsm->BaseAttackDelay / Difficulty.AttackSpeedMultiplier;
+
+	UE_LOG(LogTemp, Warning,
+		TEXT("[Enemy] ApplyDifficulty | Star=%d | HP=%.1d | Range=%.1f | Delay=%.2f"),
+		StarLevel,
+		fsm->hp,
+		fsm->attackRange,
+		fsm->attackDelayTime
+	);
+}
