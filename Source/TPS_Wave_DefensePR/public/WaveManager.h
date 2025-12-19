@@ -168,4 +168,33 @@ public:
 public:
 	// 언제 스폰할지 판단하는 함수
 	float GetSpawnInterval();
+
+public:
+	// Kill & Score System 
+	UPROPERTY(BlueprintReadOnly, Category = "Score")
+	int32 KillCount = 0;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Score")
+	int32 Score = 0;
+
+	// GameOver 시 기록용
+	UPROPERTY(BlueprintReadOnly, Category = "Score")
+	int32 FinalStage = 0;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Score")
+	int32 FinalKillCount = 0;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Score")
+	int32 FinalScore = 0;
+
+	// Enemy 사망 시 호출
+	UFUNCTION()
+	void RegisterKill(class AEnemy* DeadEnemy);
+
+	// 점수 계산
+	int32 CalculateScore(class AEnemy* DeadEnemy);
+
+	// GameOver 처리
+	void HandleGameOver();
+
 };

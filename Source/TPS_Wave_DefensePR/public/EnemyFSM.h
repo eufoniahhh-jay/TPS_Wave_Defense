@@ -115,4 +115,7 @@ public:
 	float BaseAttackRange;
 	float BaseAttackDelay;
 
+public:
+	// killcount, score 위한 코드
+	bool bKillReported = false;
 };

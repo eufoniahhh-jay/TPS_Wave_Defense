@@ -259,6 +259,26 @@ void UEnemyFSM::OnDamageProcess()
 	}
 	// 그렇지 않다면
 	else {
+		// kill count 처리
+		if (!bKillReported) {
+			bKillReported = true;
+
+			UE_LOG(LogTemp, Warning,
+				TEXT("[EnemyFSM] Kill Reported | Enemy=%s"),
+				*GetOwner()->GetName());
+
+			// WaveManager 찾기 - BeginPlay에서 찾은 멤버 WaveManager 사용
+			if (WaveManager)
+			{
+				WaveManager->RegisterKill(me);  // me는 BeginPlay에서 GetOwner()로 캐싱해둔 AEnemy*
+				//WaveManager->RegisterKill(GetOwner<AEnemy>());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("[EnemyFSM] WaveManager is null"));
+			}
+		}
+
 		// 상태를 죽음으로 전환
 		mState = EEnemyState::Die;
 		// 캡슐 충돌체 비활성화

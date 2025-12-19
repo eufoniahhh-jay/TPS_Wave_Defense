@@ -70,6 +70,9 @@ void AWaveManager::StartWave()
     WaveState = EWaveState::InWave;
     RemainingTime = WaveDuration;
 
+    // kill ocunt 테스트 로그
+    //RegisterKill(nullptr);
+
     // enemy Difficulty 테스트 로그 - 스테이지 당 가능한 enemy
     //auto Available = GetAvailableDifficulties();
     //FString Debug;
@@ -346,4 +349,51 @@ float AWaveManager::GetSpawnInterval()
     }
 
     return FMath::FRandRange(Min, Max);
+}
+
+void AWaveManager::RegisterKill(AEnemy* DeadEnemy)
+{
+    KillCount++;
+
+    Score += CalculateScore(DeadEnemy);
+
+    UE_LOG(LogTemp, Log,
+        TEXT("[WaveManager] Kill Registered | Kill: %d | Score: %d"),
+        KillCount, Score
+    );
+}
+
+int32 AWaveManager::CalculateScore(AEnemy* DeadEnemy)
+{
+    if (!DeadEnemy)
+        return 0;
+
+    // 예시: star 1~5 기반
+    int32 StarLevel = 1;
+
+    // 네 Enemy 구조에 맞게 수정
+    if (DeadEnemy->StarLevel > 0)
+    {
+        StarLevel = DeadEnemy->StarLevel;
+    }
+
+    return 100 * StarLevel;
+}
+
+void AWaveManager::HandleGameOver()
+{
+    FinalStage = CurrentStage;
+    FinalKillCount = KillCount;
+    FinalScore = Score;
+
+    //bIsWaveActive = false;
+
+    UE_LOG(LogTemp, Warning,
+        TEXT("[WaveManager] GameOver | Stage: %d | Kill: %d | Score: %d"),
+        FinalStage, FinalKillCount, FinalScore
+    );
+
+    // TODO (다음 단계):
+    // - EnemyManager 스폰 중단
+    // - GameOver UI 표시 (BP 이벤트)
 }
