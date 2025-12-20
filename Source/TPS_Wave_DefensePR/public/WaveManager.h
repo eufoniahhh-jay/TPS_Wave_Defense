@@ -35,6 +35,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
 	int32, Stage
 );
 
+// 킬 스코어 업데이트 이벤트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FOnScoreUpdated,
+	int32, KillCount,
+	int32, Score
+);
 
 UENUM(BlueprintType)
 enum class EWaveState : uint8
@@ -171,6 +177,9 @@ public:
 
 public:
 	// Kill & Score System 
+	UPROPERTY(BlueprintAssignable, Category = "Wave|Score")
+	FOnScoreUpdated OnScoreUpdated;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Score")
 	int32 KillCount = 0;
 
@@ -196,5 +205,7 @@ public:
 
 	// GameOver 처리
 	void HandleGameOver();
+
+	
 
 };

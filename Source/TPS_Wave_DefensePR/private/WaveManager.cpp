@@ -357,6 +357,9 @@ void AWaveManager::RegisterKill(AEnemy* DeadEnemy)
 
     Score += CalculateScore(DeadEnemy);
 
+    // UI에 알림(브로드캐스트)
+    OnScoreUpdated.Broadcast(KillCount, Score);
+
     UE_LOG(LogTemp, Log,
         TEXT("[WaveManager] Kill Registered | Kill: %d | Score: %d"),
         KillCount, Score
