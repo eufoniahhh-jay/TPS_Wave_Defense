@@ -206,6 +206,11 @@ public:
 	// GameOver 처리
 	void HandleGameOver();
 
+public:
+	// score, stage, kill getter함수
+	int32 GetFinalScore() const { return FinalScore; };
+	int32 GetFinalStage() const { return FinalStage; };
+	int32 GetFinalKill() const { return FinalKillCount; };
 	
 
 };

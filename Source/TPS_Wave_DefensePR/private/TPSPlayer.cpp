@@ -10,6 +10,9 @@
 #include "PlayerFire.h"
 #include "TPS_Wave_DefensePR.h"
 #include <Kismet/GameplayStatics.h>
+#include "WaveManager.h"
+#include "RankingSaveGame.h"
+#include "RankEntry.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -95,6 +98,23 @@ void ATPSPlayer::BeginPlay()
 	}
 
 	hp = initialHp;
+
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(
+		GetWorld(),
+		AWaveManager::StaticClass(),
+		FoundActors
+	);
+
+	if (FoundActors.Num() > 0)
+	{
+		WaveManager = Cast<AWaveManager>(FoundActors[0]);
+		UE_LOG(LogTemp, Warning, TEXT("[TPSPlayer] WaveManager FOUND"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[TPSPlayer] WaveManager NOT FOUND"));
+	}
 }
 
 // Called every frame
@@ -131,10 +151,79 @@ void ATPSPlayer::OnHitEvent()
 
 void ATPSPlayer::OnGameOver_Implementation()
 {
+	if (!WaveManager) {
+		UE_LOG(LogTemp, Error, TEXT("[OnGameOver] WaveManager is null"));
+		return;
+	}
+
+	// 여기서 waveManager의 GAmeOver를 트리거?
+	WaveManager->HandleGameOver();
+
+	FinalStage = WaveManager->GetFinalStage();
+	FinalScore = WaveManager->GetFinalScore();
+	FinalKillCount = WaveManager->GetFinalKill();
+
+	UE_LOG(LogTemp, Warning,
+		TEXT("[GameOver Result] Score=%d Stage=%d Kill=%d"),
+		FinalScore, FinalStage, FinalKillCount
+	);
+
+	// 랭킹 시스템
+	SaveRankingResult();
+
 	// 게임 오버 시 일시 정지
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }
 
+void ATPSPlayer::SaveRankingResult()
+{
+	URankingSaveGame* SaveData = nullptr;
+
+	if (UGameplayStatics::DoesSaveGameExist("RankingSlot", 0))
+	{
+		SaveData = Cast<URankingSaveGame>(
+			UGameplayStatics::LoadGameFromSlot("RankingSlot", 0)
+		);
+	}
+	else
+	{
+		SaveData = Cast<URankingSaveGame>(
+			UGameplayStatics::CreateSaveGameObject(
+				URankingSaveGame::StaticClass()
+			)
+		);
+	}
+
+	if (!SaveData)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Ranking] Failed to load/create SaveGame"));
+		return;
+	}
+
+	// RankEntry 생성
+	FRankEntry NewEntry;
+	NewEntry.PlayerName = TEXT("PLAYER");   // 오늘은 하드코딩 OK
+	NewEntry.Score = FinalScore;
+	NewEntry.Stage = FinalStage;
+	NewEntry.KillCount = FinalKillCount;
+
+	// 추가 + 정렬 + Top10 유지
+	SaveData->AddEntryAndSort(NewEntry, 10);
+
+	// 저장
+	UGameplayStatics::SaveGameToSlot(SaveData, "RankingSlot", 0);
+
+	// 로그로 검증
+	SaveData->DebugPrintRanks();
+
+	// top 10 로그로 보기
+	int32 Rank = SaveData->FindEntryRank(NewEntry);
+	UE_LOG(LogTemp, Warning,
+		TEXT("[Ranking] Current Rank: %d / %d"),
+		Rank,
+		SaveData->TopRanks.Num()
+	);
+}
 
 
 

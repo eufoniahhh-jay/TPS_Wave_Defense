@@ -73,4 +73,20 @@ public:
 	// 총 바꿀 때 호출되는 이벤트 함수
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Health)
 	void OnUsingGrenade(bool isGrenade);
+
+public:
+	UPROPERTY()
+	class AWaveManager* WaveManager;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Score")
+	int32 FinalStage = 0;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Score")
+	int32 FinalKillCount = 0;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Score")
+	int32 FinalScore = 0;
+
+	// 랭킹 저장 함수
+	void SaveRankingResult();
 };
