@@ -42,6 +42,14 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
 	int32, Score
 );
 
+// 게임 종료시 랭크 기록 위한 스코어, 킬, 스테이지 이벤트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
+	FOnGameOver,
+	int32, FinalStage,
+	int32, FinalScore,
+	int32, FinalKill
+);
+
 UENUM(BlueprintType)
 enum class EWaveState : uint8
 {
@@ -76,7 +84,7 @@ public:
 
 	// 웨이브 제한 시간(초). 기본 60초
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wave|Timer", meta = (ClampMin = "1.0"))
-	float WaveDuration = 10.f;
+	float WaveDuration = 30.f;
 
 	// 현재 웨이브 남은 시간(초) - 웨이브 시작 시 WaveDuration으로 세팅될 예정
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Wave|Timer")
@@ -212,5 +220,8 @@ public:
 	int32 GetFinalStage() const { return FinalStage; };
 	int32 GetFinalKill() const { return FinalKillCount; };
 	
-
+public:
+	// 게임 종료시 랭킹 업데이트를 위해 스코어 값을 넘겨주기
+	UPROPERTY(BlueprintAssignable, Category = "Score")
+	FOnGameOver OnGameOver;
 };

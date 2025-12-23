@@ -168,11 +168,16 @@ void ATPSPlayer::OnGameOver_Implementation()
 		FinalScore, FinalStage, FinalKillCount
 	);
 
-	// 랭킹 시스템
-	SaveRankingResult();
+	// 랭킹 시스템 -> 위젯 블루프린트에서 이걸 호출하도록 수정
+	//SaveRankingResult();
 
 	// 게임 오버 시 일시 정지
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
+}
+
+void ATPSPlayer::SetPlayerName(const FString& InName)
+{
+	PlayerName = InName;
 }
 
 void ATPSPlayer::SaveRankingResult()
@@ -202,7 +207,8 @@ void ATPSPlayer::SaveRankingResult()
 
 	// RankEntry 생성
 	FRankEntry NewEntry;
-	NewEntry.PlayerName = TEXT("PLAYER");   // 오늘은 하드코딩 OK
+	//NewEntry.PlayerName = TEXT("PLAYER");   
+	NewEntry.PlayerName = PlayerName.IsEmpty() ? TEXT("PLAYER") : PlayerName;
 	NewEntry.Score = FinalScore;
 	NewEntry.Stage = FinalStage;
 	NewEntry.KillCount = FinalKillCount;

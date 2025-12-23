@@ -399,4 +399,6 @@ void AWaveManager::HandleGameOver()
     // TODO (다음 단계):
     // - EnemyManager 스폰 중단
     // - GameOver UI 표시 (BP 이벤트)
+
+    OnGameOver.Broadcast(FinalStage, FinalScore, FinalKillCount);
 }

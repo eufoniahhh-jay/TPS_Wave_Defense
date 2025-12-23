@@ -87,6 +87,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Score")
 	int32 FinalScore = 0;
 
+public:
+	// 랭킹 저장 이름
+	UPROPERTY(BlueprintReadWrite, Category = "Ranking")
+	FString PlayerName;
+
+	void SetPlayerName(const FString& InName);
+
 	// 랭킹 저장 함수
+	UFUNCTION(BlueprintCallable, Category = "Ranking")
 	void SaveRankingResult();
 };
