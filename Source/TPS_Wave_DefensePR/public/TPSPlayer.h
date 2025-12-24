@@ -92,9 +92,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Ranking")
 	FString PlayerName;
 
+	UPROPERTY(BlueprintReadOnly)
+	int32 MyRankIndex;
+
 	void SetPlayerName(const FString& InName);
 
 	// 랭킹 저장 함수
 	UFUNCTION(BlueprintCallable, Category = "Ranking")
 	void SaveRankingResult();
+
+
 };

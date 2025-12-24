@@ -224,6 +224,8 @@ void ATPSPlayer::SaveRankingResult()
 
 	// top 10 로그로 보기
 	int32 Rank = SaveData->FindEntryRank(NewEntry);
+	MyRankIndex = Rank - 1;		// 순위정보를 UI_GameOver에서 UI_RankingBoard로 넘겨주기 위함. (UI에서는 0-based가 편함)
+
 	UE_LOG(LogTemp, Warning,
 		TEXT("[Ranking] Current Rank: %d / %d"),
 		Rank,
