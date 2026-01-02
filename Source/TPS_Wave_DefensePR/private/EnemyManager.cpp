@@ -57,7 +57,7 @@ void AEnemyManager::CreateEnemy()
 	// 적 생성 및 배치하기
 	AEnemy* Enemy = GetWorld()->SpawnActor<AEnemy>(enemyFactory, spawnPoints[index]->GetActorLocation(), FRotator(0));
 
-	// Difficulty 적용
+	/*// Difficulty 적용
 	if (Enemy && WaveManager)
 	{
 		FEnemyDifficulty Diff = WaveManager->GetDifficultyForSpawn();
@@ -67,7 +67,39 @@ void AEnemyManager::CreateEnemy()
 			TEXT("[EnemyManager] Spawn Enemy | Star=%d"),
 			Diff.StarLevel
 		);
+	}*/
+
+	// Data Asset 반영 Difficulty 적용
+	// 부터
+	if (!Enemy)
+		return;
+
+	// 1. Difficulty 획득
+	FEnemyDifficulty Diff = WaveManager->GetDifficultyForSpawn();
+
+	// 2. EnemyData 적용 (Base + 외형)
+	UEnemyDataAsset* EnemyData = GetEnemyDataByStar(Diff.StarLevel);
+	if (EnemyData)
+	{
+		Enemy->ApplyEnemyData(EnemyData);
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning,
+			TEXT("[EnemyManager] EnemyData not found for Star=%d"),
+			Diff.StarLevel
+		);
+	}
+
+	// 3. Difficulty 적용 (Multiplier)
+	Enemy->ApplyDifficulty(Diff);
+
+	UE_LOG(LogTemp, Log,
+		TEXT("[EnemyManager] Spawn Enemy | Star=%d"),
+		Diff.StarLevel
+	);
+
+	// 까지
 
 	// 다시 랜덤 시간에 CreateEnemy 함수가 호출되도록 타이머 설정
 	/*float createTime = FMath::RandRange(minTime, maxTime);
@@ -175,4 +207,22 @@ void AEnemyManager::StopSpawning()
 	GetWorld()->GetTimerManager().ClearTimer(spawnTimerHandle);
 
 	UE_LOG(LogTemp, Log, TEXT("[EnemyManager] Stop Wave Spawning"));
+}
+
+UEnemyDataAsset* AEnemyManager::GetEnemyDataByStar(int32 StarLevel) const
+{
+	int32 Index = StarLevel - 1;
+
+	if (EnemyDataAssets.IsValidIndex(Index))
+	{
+		return EnemyDataAssets[Index];
+	}
+
+	UE_LOG(LogTemp, Warning,
+		TEXT("[EnemyManager] Invalid StarLevel %d (EnemyDataAssets Num=%d)"),
+		StarLevel,
+		EnemyDataAssets.Num()
+	);
+
+	return nullptr;
 }

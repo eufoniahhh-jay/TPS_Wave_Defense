@@ -6,6 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "EnemyManager.generated.h"
 
+// 이건 없어도..?
+class AEnemy;
+class AWaveManager;
+class UEnemyDataAsset;
+
 UCLASS()
 class TPS_WAVE_DEFENSEPR_API AEnemyManager : public AActor
 {
@@ -56,5 +61,14 @@ public:
 	UPROPERTY()
 	class AWaveManager* WaveManager;
 
-	
+public:
+	// Enemy Data 관리
+
+	// StarLevel(1~5)에 대응하는 EnemyDataAsset 배열
+	// [0] = Star1, [1] = Star2, ...
+	UPROPERTY(EditAnywhere, Category = "Enemy|Data")
+	TArray<TObjectPtr<UEnemyDataAsset>> EnemyDataAssets;
+
+	// StarLevel로 EnemyDataAsset 가져오기
+	UEnemyDataAsset* GetEnemyDataByStar(int32 StarLevel) const;
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "EnemyDataAsset.h"
 #include "Enemy.generated.h"
 
 USTRUCT(BlueprintType)
@@ -64,6 +65,9 @@ public:
 public:
 	// difficulty 적용 함수
 	void ApplyDifficulty(const FEnemyDifficulty& Difficulty);
+
+	// Data Asset으로부터 difficulty 적용 함수
+	void ApplyEnemyData(class UEnemyDataAsset* Data);
 
 	// 시작 difficulty
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

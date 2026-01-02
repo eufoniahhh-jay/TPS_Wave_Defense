@@ -3,6 +3,7 @@
 
 #include "Enemy.h"
 #include "EnemyFSM.h"
+#include "EnemyDataAsset.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -83,5 +84,48 @@ void AEnemy::ApplyDifficulty(const FEnemyDifficulty& Difficulty)
 		fsm->hp,
 		fsm->attackRange,
 		fsm->attackDelayTime
+	);
+}
+
+void AEnemy::ApplyEnemyData(UEnemyDataAsset* Data)
+{
+	if (!Data)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Enemy] ApplyEnemyData failed: Data is null"));
+		return;
+	}
+
+	if (!fsm)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Enemy] ApplyEnemyData failed: FSM is null"));
+		return;
+	}
+
+	// =========================
+	// 1. Base 스탯 적용
+	// =========================
+	fsm->BaseHP = Data->BaseHP;
+	fsm->BaseAttackRange = Data->BaseAttackRange;
+	fsm->BaseAttackDelay = Data->BaseAttackDelay;
+
+	// =========================
+	// 2. (선택) 외형 적용
+	// 지금은 없어도 됨
+	// =========================
+	if (Data->SkeletalMesh)
+	{
+		GetMesh()->SetSkeletalMesh(Data->SkeletalMesh);
+	}
+
+	if (Data->AnimBlueprint)
+	{
+		GetMesh()->SetAnimInstanceClass(Data->AnimBlueprint);
+	}
+
+	UE_LOG(LogTemp, Log,
+		TEXT("[Enemy] ApplyEnemyData | BaseHP=%d | BaseRange=%.1f | BaseDelay=%.2f"),
+		fsm->BaseHP,
+		fsm->BaseAttackRange,
+		fsm->BaseAttackDelay
 	);
 }
