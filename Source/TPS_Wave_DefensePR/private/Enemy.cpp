@@ -120,6 +120,13 @@ void AEnemy::ApplyEnemyData(UEnemyDataAsset* Data)
 	if (Data->AnimBlueprint)
 	{
 		GetMesh()->SetAnimInstanceClass(Data->AnimBlueprint);
+
+		/*UE_LOG(LogTemp, Warning,
+			TEXT("[Enemy] Set AnimBP = %s"),
+			*GetNameSafe(Data->AnimBlueprint)
+		);*/
+		UE_LOG(LogTemp, Warning, TEXT("[Enemy] After SetAnimBP AnimInstance=%s"),
+			*GetNameSafe(GetMesh()->GetAnimInstance()));
 	}
 
 	UE_LOG(LogTemp, Log,

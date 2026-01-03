@@ -46,7 +46,7 @@ void AEnemyManager::Tick(float DeltaTime)
 
 }
 
-void AEnemyManager::CreateEnemy()
+/*void AEnemyManager::CreateEnemy()
 {
 	// + 안전 장치
 	if (spawnPoints.Num() == 0 || !enemyFactory)
@@ -57,17 +57,17 @@ void AEnemyManager::CreateEnemy()
 	// 적 생성 및 배치하기
 	AEnemy* Enemy = GetWorld()->SpawnActor<AEnemy>(enemyFactory, spawnPoints[index]->GetActorLocation(), FRotator(0));
 
-	/*// Difficulty 적용
-	if (Enemy && WaveManager)
-	{
-		FEnemyDifficulty Diff = WaveManager->GetDifficultyForSpawn();
-		Enemy->ApplyDifficulty(Diff);
-
-		UE_LOG(LogTemp, Log,
-			TEXT("[EnemyManager] Spawn Enemy | Star=%d"),
-			Diff.StarLevel
-		);
-	}*/
+	//// Difficulty 적용
+	//if (Enemy && WaveManager)
+	//{
+	//	FEnemyDifficulty Diff = WaveManager->GetDifficultyForSpawn();
+	//	Enemy->ApplyDifficulty(Diff);
+	//
+	//	UE_LOG(LogTemp, Log,
+	//		TEXT("[EnemyManager] Spawn Enemy | Star=%d"),
+	//		Diff.StarLevel
+	//	);
+	//}
 
 	// Data Asset 반영 Difficulty 적용
 	// 부터
@@ -102,8 +102,8 @@ void AEnemyManager::CreateEnemy()
 	// 까지
 
 	// 다시 랜덤 시간에 CreateEnemy 함수가 호출되도록 타이머 설정
-	/*float createTime = FMath::RandRange(minTime, maxTime);
-	GetWorld()->GetTimerManager().SetTimer(spawnTimerHandle, this, &AEnemyManager::CreateEnemy, createTime);*/
+	//float createTime = FMath::RandRange(minTime, maxTime);
+	//GetWorld()->GetTimerManager().SetTimer(spawnTimerHandle, this, &AEnemyManager::CreateEnemy, createTime);
 
 	// 이제는 wave가 증가할 수록 더 빨리 적이 생성되도록 할 것이므로, stage 반영해서 수정
 	float createTime = minTime;
@@ -126,7 +126,72 @@ void AEnemyManager::CreateEnemy()
 		createTime,
 		WaveManager ? WaveManager->GetCurrentStage() : -1
 	);
+}*/
+
+void AEnemyManager::CreateEnemy()
+{
+	// + 안전 장치
+	if (spawnPoints.Num() == 0 || !enemyFactory || !WaveManager)
+		return;
+
+	// 랜덤 위치 구하기
+	int index = FMath::RandRange(0, spawnPoints.Num() - 1);
+	FTransform SpawnTM(FRotator::ZeroRotator, spawnPoints[index]->GetActorLocation());
+
+	// 1. Deferred Spawn
+	AEnemy* Enemy = GetWorld()->SpawnActorDeferred<AEnemy>(enemyFactory, SpawnTM);
+	if (!Enemy)
+		return;
+
+	// Data Asset 반영 Difficulty 적용
+	// 2. Difficulty 획득
+	FEnemyDifficulty Diff = WaveManager->GetDifficultyForSpawn();
+
+	// 3. EnemyData 적용 (Mesh / AnimBP / BaseStat)
+	UEnemyDataAsset* EnemyData = GetEnemyDataByStar(Diff.StarLevel);
+	if (EnemyData)
+	{
+		Enemy->ApplyEnemyData(EnemyData);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning,
+			TEXT("[EnemyManager] EnemyData not found for Star=%d"),
+			Diff.StarLevel
+		);
+	}
+
+	// 4. Difficulty 적용 (Multiplier)
+	Enemy->ApplyDifficulty(Diff);
+
+	// 5. 여기서 BeginPlay 실행됨
+	UGameplayStatics::FinishSpawningActor(Enemy, SpawnTM);
+
+	UE_LOG(LogTemp, Log,
+		TEXT("[EnemyManager] Spawn Enemy | Star=%d"),
+		Diff.StarLevel
+	);
+
+	// Spawn Interval 처리
+	// 이제는 wave가 증가할 수록 더 빨리 적이 생성되도록 할 것이므로, stage 반영해서 수정
+	float createTime = minTime;
+	createTime = WaveManager->GetSpawnInterval();
+
+	GetWorld()->GetTimerManager().SetTimer(
+		spawnTimerHandle,
+		this,
+		&AEnemyManager::CreateEnemy,
+		createTime,
+		false
+	);
+
+	UE_LOG(LogTemp, Log,
+		TEXT("[EnemyManager] Next Spawn In %.2f sec (Stage=%d)"),
+		createTime,
+		WaveManager->GetCurrentStage()
+	);
 }
+
 
 // 스폰 위치 동적할당
 void AEnemyManager::FindSpawnPoints()

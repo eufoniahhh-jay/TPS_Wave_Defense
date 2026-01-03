@@ -64,6 +64,14 @@ void UEnemyFSM::BeginPlay()
 	BaseHP = hp;
 	BaseAttackRange = attackRange;
 	BaseAttackDelay = attackDelayTime;
+
+	//
+	UE_LOG(LogTemp, Warning, TEXT("[EnemyFSM] AnimInstance=%s"),
+		*GetNameSafe(me ? me->GetMesh()->GetAnimInstance() : nullptr));
+
+	UE_LOG(LogTemp, Warning, TEXT("[EnemyFSM] Cached anim=%s"),
+		*GetNameSafe(anim));
+
 }
 
 
@@ -233,7 +241,7 @@ void UEnemyFSM::DieState()
 	me->SetActorLocation(P);
 
 	// 1. 만약 2미터 이상 내려왔다면
-	if (P.Z < -200.0f) {
+	if (P.Z < -250.0f) {
 		// 2. 제거시킨다
 		me->Destroy();
 	}
