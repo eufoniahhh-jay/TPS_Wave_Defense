@@ -18,13 +18,13 @@ struct FRankEntry
 	FString PlayerName;
 
 	UPROPERTY(BlueprintReadWrite)
-	int32 Score;
+	int32 Score = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Stage;
+	int32 Stage = 0;
 
 	UPROPERTY(BlueprintReadWrite)
-	int32 KillCount;
+	int32 KillCount = 0;
 };
 
 class TPS_WAVE_DEFENSEPR_API RankEntry
