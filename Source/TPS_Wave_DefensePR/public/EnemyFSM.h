@@ -53,7 +53,7 @@ public:
 
 	// 대기 시간
 	UPROPERTY(EditAnywhere, Category = FSM)
-	float idleDelayTime = 2;
+	float idleDelayTime = 1;
 	// 경과 시간
 	float currentTime = 0;
 
@@ -71,7 +71,7 @@ public:
 
 	// 공격 대기 시간
 	UPROPERTY(VisibleAnywhere, Category = FSM)
-	float attackDelayTime = 3.0f;
+	float attackDelayTime = 2.0f;
 
 	// 피격 알림 이벤트 함수
 	void OnDamageProcess();

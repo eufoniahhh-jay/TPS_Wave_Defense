@@ -84,7 +84,7 @@ public:
 
 	// 웨이브 제한 시간(초). 기본 60초
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wave|Timer", meta = (ClampMin = "1.0"))
-	float WaveDuration = 15.f;
+	float WaveDuration = 30.f;
 
 	// 현재 웨이브 남은 시간(초) - 웨이브 시작 시 WaveDuration으로 세팅될 예정
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Wave|Timer")
