@@ -70,6 +70,17 @@ void AWaveManager::StartWave()
     WaveState = EWaveState::InWave;
     RemainingTime = WaveDuration;
 
+    // 사운드 이펙트 적용
+    // 웨이브가 새로 시작되므로, 이번 웨이브용 플래그 리셋
+    bPlayedWaveStartSfx = false;
+    bPlayedWaveEndSfx = false;
+    // Wave Start SFX (2D)
+    if (!bPlayedWaveStartSfx && WaveStartSFX)
+    {
+        UGameplayStatics::PlaySound2D(this, WaveStartSFX);
+        bPlayedWaveStartSfx = true;
+    }
+
     // kill ocunt 테스트 로그
     //RegisterKill(nullptr);
 
@@ -142,6 +153,14 @@ void AWaveManager::EndWave()
     GetWorldTimerManager().ClearTimer(WaveTimerHandle);
 
     WaveState = EWaveState::WaveEnd;
+
+    // 사운드 이펙트 적용
+    // Wave End SFX (2D)
+    if (!bPlayedWaveEndSfx && WaveEndSFX)
+    {
+        UGameplayStatics::PlaySound2D(this, WaveEndSFX);
+        bPlayedWaveEndSfx = true;
+    }
 
     if (bDebugLog)
     {
@@ -395,6 +414,12 @@ void AWaveManager::HandleGameOver()
         TEXT("[WaveManager] GameOver | Stage: %d | Kill: %d | Score: %d"),
         FinalStage, FinalKillCount, FinalScore
     );
+
+    // 게임오버 사운드
+    if (GameOverSFX)
+    {
+        UGameplayStatics::PlaySound2D(this, GameOverSFX);
+    }
 
     // TODO (다음 단계):
     // - EnemyManager 스폰 중단

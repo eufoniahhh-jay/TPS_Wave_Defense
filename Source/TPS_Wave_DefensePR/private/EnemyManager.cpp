@@ -172,6 +172,13 @@ void AEnemyManager::CreateEnemy()
 		Diff.StarLevel
 	);
 
+	// star5 사운드 적용
+	if (EnemyData && Diff.StarLevel == 5)
+	{
+		UGameplayStatics::PlaySound2D(this, Star5SpawnSFX);
+	}
+
+
 	// Spawn Interval 처리
 	// 이제는 wave가 증가할 수록 더 빨리 적이 생성되도록 할 것이므로, stage 반영해서 수정
 	float createTime = minTime;

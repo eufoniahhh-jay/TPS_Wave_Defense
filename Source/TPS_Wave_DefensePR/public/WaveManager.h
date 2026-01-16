@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Enemy.h"
+#include "Sound/SoundBase.h"
 #include "WaveManager.generated.h"
 
 /*WaveManager는 enum 기반 상태 머신과
@@ -224,4 +225,20 @@ public:
 	// 게임 종료시 랭킹 업데이트를 위해 스코어 값을 넘겨주기
 	UPROPERTY(BlueprintAssignable, Category = "Score")
 	FOnGameOver OnGameOver;
+
+public:
+	// 사운드 관련
+	// ---- Audio (Wave UI SFX) ----
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio|Wave")
+	TObjectPtr<USoundBase> WaveStartSFX = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio|Wave")
+	TObjectPtr<USoundBase> WaveEndSFX = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio|Game")
+	TObjectPtr<USoundBase> GameOverSFX = nullptr;
+
+	// 중복 재생 방지
+	bool bPlayedWaveStartSfx = false;
+	bool bPlayedWaveEndSfx = false;
 };

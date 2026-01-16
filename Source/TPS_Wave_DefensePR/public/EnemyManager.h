@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Sound/SoundBase.h"
 #include "EnemyManager.generated.h"
 
 // 이건 없어도..?
@@ -71,4 +72,9 @@ public:
 
 	// StarLevel로 EnemyDataAsset 가져오기
 	UEnemyDataAsset* GetEnemyDataByStar(int32 StarLevel) const;
+
+public:
+	// 사운드 관련
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio|Enemy")
+	TObjectPtr<USoundBase> Star5SpawnSFX = nullptr;
 };
